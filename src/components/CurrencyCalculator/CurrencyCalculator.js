@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
+import ExchangeHistory from '../ExchangeHistory/ExchangeHistory';
 import getSymbolFromCurrency from 'currency-symbol-map';
-import { fetchFixerIoCurrencies, fetchFixerSupportedSymbols, fetchOandaSupportedSymbols, fetchOandaCurrencies } from '../../utils/currencySourceApi.util';
+import {
+	fetchFixerIoCurrencies,
+	fetchFixerSupportedSymbols,
+	fetchOandaSupportedSymbols,
+	fetchOandaCurrencies
+} from '../../utils/currencySourceApi.util';
+
+import {
+	saveToLocalStorage
+} from '../../utils/localStorage.util';
 
 
 const customStyles = {
@@ -94,12 +104,11 @@ class CurrencyCalculator extends React.Component {
 			}
 		}
 		this.options = convertedArray;
-		console.log(this.options.length);
 	}
 
 	fetchCurrencyRate = (e) => {
 		const { currencyFrom, currencyTo, startDate, currencySource } = this.state;
-		console.log(this.input.value);
+
 		if (this.input.value !== '' && currencyFrom !== '' && currencyTo !== '') {
 			if (currencySource === 'Oanda') {
 				fetchOandaCurrencies(currencyFrom, currencyTo, startDate).then((res) => {
@@ -151,7 +160,7 @@ class CurrencyCalculator extends React.Component {
 							this.onCurrencySelectChange(true, input);
 						}}
 					/>
-					<svg onClick={() => this.swapCurrencies()} aria-hidden='true' data-id='icon-exchange' viewBox='0 0 50 47' height='32px' width='30px'>
+					<svg aria-hidden='true' data-id='icon-exchange' viewBox='0 0 50 47' height='32px' width='30px'>
 						<path fill='currentColor' fillRule='evenodd' d='M49.897 35.977L26.597 25v7.874H7.144v6.207h19.455v7.874zM.103 11.642l23.3 10.977v-7.874h19.454V8.538H23.402V.664z' />
 					</svg>
 					<Select
@@ -169,13 +178,17 @@ class CurrencyCalculator extends React.Component {
 
 	calculateAndDisplayRate = () => {
 		const { inputValue, currencyRate, currencyTo } = this.state;
+		const calculatedAmount = inputValue * currencyRate;
+
 		return (
-			<h3>{inputValue * currencyRate} {currencyTo}</h3>
+			<h3>{calculatedAmount} {currencyTo}</h3>
 		);
 	}
 
 	renderResult = () => {
-		const { currencyFrom, currencyTo, error } = this.state;
+		const { currencyFrom, currencyTo, error, inputValue, currencySource, calculatedAmount, startDate, currencyRate } = this.state;
+		let amount = inputValue * currencyRate;
+
 		if (currencyFrom !== '' && currencyTo !== '' && this.input.value !== '' && !error) {
 			return (
 				<>
@@ -196,9 +209,22 @@ class CurrencyCalculator extends React.Component {
 						<form className='form-inline'>
 							<div className='form-group mx-sm-3 mb-2'>
 								<label htmlFor='inputPassword2' className='sr-only'>Notes</label>
-								<input type='text' className='form-control' id='notes' placeholder='Your notes' />
+								<input
+									type='text'
+									ref={(inputRef) => this.notes = inputRef}
+									className='form-control'
+									id='notes'
+									placeholder='Your notes'
+								/>
 							</div>
-							<button type='submit' className='btn btn-primary mb-2'>Save</button>
+							<button type='submit' onClick={(e) => {
+								e.preventDefault();
+								saveToLocalStorage(currencyFrom, currencyTo, inputValue, amount, startDate, currencySource, this.notes.value);
+								this.forceUpdate();
+							} }
+				        className='btn btn-primary mb-2'>
+								Save
+							</button>
 						</form>
 					</div>
 				</>
@@ -207,8 +233,42 @@ class CurrencyCalculator extends React.Component {
 		return <div />;
 	}
 
+	renderHistory () {
+		let history = JSON.parse(localStorage.getItem('exchangeHistory'))
+		return (
+			<div className='exchange-history'>
+				<table className="table table-responsive">
+					<thead>
+					<tr>
+						<th scope="col">Source Currency</th>
+						<th scope="col">Source Amount</th>
+						<th scope="col">Destination Currency</th>
+						<th scope="col">Calculated Amount</th>
+						<th scope="col">DateTime</th>
+						<th scope="col">Rate Source</th>
+						<th scope="col">Notes</th>
+					</tr>
+					</thead>
+					<tbody>
+					{ history.map((row) =>
+						<tr>
+							<td>{row.currencyFrom}</td>
+							<td>{row.value}</td>
+							<td>{row.currencyTo}</td>
+							<td>{row.calculatedAmount}</td>
+							<td>{row.date}</td>
+							<td>{row.source}</td>
+							<td>{row.notes}</td>
+						</tr>
+					) }
+					</tbody>
+				</table>
+			</div>
+		);
+	}
 
 	render() {
+		const historyLength = JSON.parse(localStorage.getItem('exchangeHistory'))?.length;
 		return (
 			<>
 				<form className='calculator' action=''>
@@ -236,6 +296,7 @@ class CurrencyCalculator extends React.Component {
 					{this.renderCalculatorFields()}
 				</form>
 				{this.renderResult()}
+				{ historyLength > 0 ? this.renderHistory() : null}
 			</>
 		);
 	}

@@ -9,9 +9,9 @@ function App() {
 				<div className='calculator-wrapper'>
 					<CurrencyCalculator />
 				</div>
-				<div className='history-wrapper'>
-					<ExchangeHistory />
-				</div>
+				{/*<div className='history-wrapper'>*/}
+				{/*	<ExchangeHistory />*/}
+				{/*</div>*/}
 			</div>
 		</>
 	);

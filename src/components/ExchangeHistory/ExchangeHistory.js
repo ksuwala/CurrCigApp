@@ -1,13 +1,14 @@
 import * as React from 'react';
 
 class ExchangeHistory extends React.Component {
+
 	render () {
+		let history = JSON.parse(localStorage.getItem('exchangeHistory'))
 		return (
 			<div className='exchange-history'>
 				<table className="table table-responsive">
 					<thead>
 					<tr>
-						<th scope="col">#</th>
 						<th scope="col">Source Currency</th>
 						<th scope="col">Source Amount</th>
 						<th scope="col">Destination Currency</th>
@@ -18,36 +19,17 @@ class ExchangeHistory extends React.Component {
 					</tr>
 					</thead>
 					<tbody>
-					<tr>
-						<th scope="row">1</th>
-						<td>USD</td>
-						<td>100$</td>
-						<td>EUR</td>
-						<td>90$</td>
-						<td>04/07/2021</td>
-						<td>European Central Bank</td>
-						<td>Some Random Notes</td>
-					</tr>
-					<tr>
-						<th scope="row">2</th>
-						<td>USD</td>
-						<td>100$</td>
-						<td>EUR</td>
-						<td>90$</td>
-						<td>04/07/2021</td>
-						<td>European Central Bank</td>
-						<td>Some Random Notes</td>
-					</tr>
-					<tr>
-						<th scope="row">3</th>
-						<td>USD</td>
-						<td>100$</td>
-						<td>EUR</td>
-						<td>90$</td>
-						<td>04/07/2021</td>
-						<td>European Central Bank</td>
-						<td>Some Random Notes</td>
-					</tr>
+					{ history.map((row) =>
+						<tr>
+							<td>{row.currencyFrom}</td>
+							<td>{row.value}</td>
+							<td>{row.currencyTo}</td>
+							<td>{row.calculatedAmount}</td>
+							<td>{row.date}</td>
+							<td>{row.source}</td>
+							<td>{row.notes}</td>
+						</tr>
+					) }
 					</tbody>
 				</table>
 			</div>
