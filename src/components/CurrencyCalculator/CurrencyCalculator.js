@@ -112,7 +112,6 @@ class CurrencyCalculator extends React.Component {
 		if (this.input.value !== '' && currencyFrom !== '' && currencyTo !== '') {
 			if (currencySource === 'Oanda') {
 				fetchOandaCurrencies(currencyFrom, currencyTo, startDate).then((res) => {
-					console.log(res);
 					this.setState({
 						currencyRate: res.data.quotes[0]?.average_midpoint || res.data.quotes[0]?.midpoint,
 						error:        false,
