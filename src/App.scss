@@ -1,0 +1,29 @@
+@import "src/components/CurrencyCalculator/style";
+@import "src/components/ExchangeHistory/style";
+@import "css/overrides";
+body {
+  padding: 15px 0;
+}
+
+.main {
+  .calculator-wrapper, .history-wrapper {
+    max-width: 978px;
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.43) -5px 3px 25px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+
+    .result {
+      padding: 15px 25px;
+    }
+    @media (max-width: 978px) {
+      width: 90%;
+    }
+  }
+
+  .history-wrapper {
+    margin-top: 20px;
+  }
+}
