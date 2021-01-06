@@ -29,7 +29,7 @@ export const fetchOandaCurrencies = (base = 'EUR', destination, date) => {
 
 export const fetchFixerSupportedSymbols = () => {
 	const API_KEY = '52cc0dd3e07cfdb9ed579a8fa893ef31';
-	const baseUrl = `https://data.fixer.io/api/symbols`;
+	const baseUrl = `http://data.fixer.io/api/symbols`;
 	const res = axios.get(baseUrl, {
 		params: {
 			access_key: API_KEY,
